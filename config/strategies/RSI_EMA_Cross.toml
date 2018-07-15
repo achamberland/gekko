@@ -1,0 +1,11 @@
+[rsi]
+interval = 14
+
+[rsi_ema]
+interval = 14
+rsi_interval = 14
+
+[thresholds]
+crossAbove = 0.2
+crossBelow = 0.2
+persistence = 1

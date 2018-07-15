@@ -19,6 +19,8 @@ var reader = new Reader();
 var scan = function(done) {
   log.info('Scanning local history for backtestable dateranges.');
 
+debugger;
+
   reader.tableExists('candles', (err, exists) => {
 
     if(err)

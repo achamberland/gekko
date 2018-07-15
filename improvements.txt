@@ -1,0 +1,2 @@
+
+- Throw error when this.input isn't defined in Indicator's init function
