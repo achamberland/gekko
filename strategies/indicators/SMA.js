@@ -20,6 +20,7 @@ N – is the smoothing period.
 
 // required indicators
 var Indicator = function(weight) {
+  this.input = 'price';
   this.weight = weight;
   this.prices = [];
   this.result = 0;

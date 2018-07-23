@@ -18,11 +18,38 @@ var log = require('../core/log.js');
 var config = require('../core/util.js').getConfig();
 
 // strategy
+var defaults = {
+	SMA_long: 1000,
+	SMA_short: 50,
+
+	BULL_RSI: 10,
+	BULL_RSI_high: 80,
+	BULL_RSI_low: 60,
+
+	BEAR_RSI: 15,
+	BEAR_RSI_high: 50,
+	BEAR_RSI_low: 20,
+
+	BULL_MOD_high: 5,
+	BULL_MOD_low: -5,
+	BEAR_MOD_high: 15,
+	BEAR_MOD_low: -5,
+
+	ADX: 3,
+	ADX_high: 70,
+	ADX_low: 50,
+
+	PINGPONG_GAINS_PERCENTAGE: 2
+};
+
 var strat = {
-	
+
 	/* INIT */
 	init: function()
 	{
+		debugger;
+		this.settings = this.settings || defaults;
+
 		// core
 		this.name = 'RSI Bull and Bear + ADX + PingPong';
 		this.requiredHistory = config.tradingAdvisor.historySize;

@@ -4,6 +4,7 @@ var MACD = require('./MACD');
 var STOCH = require('./STOCH');
 
 var Indicator = function (settings) {
+	this.name = 'Stoch';
     this.input = 'price';
 
     this.signal = new MACD({'short': settings.short,

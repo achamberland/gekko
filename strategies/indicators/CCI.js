@@ -7,6 +7,7 @@ var log = require('../../core/log');
 var LRC = require('./LRC');
 
 var Indicator = function(settings) {
+  this.input = 'candle';
   this.tp = 0.0;
   this.TP = new LRC(settings.history);
   this.result = false;
@@ -22,8 +23,7 @@ var Indicator = function(settings) {
 Indicator.prototype.update = function(candle) {
   
   // We need sufficient history to get the right result.
-
-  var tp = (candle.h + candle.c + candle.l) / 3;
+  var tp = (candle.high + candle.close + candle.low) / 3;
   if (this.size < this.maxSize) {
       this.hist[this.size] = tp;
       this.size++;
