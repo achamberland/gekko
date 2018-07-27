@@ -5,9 +5,40 @@
  * Inspired by (okay fine, stolen) from CryptoMedication's TradingView indicator
  */
 
+const stdev = require('stdev'); // Find npm module that does this
+
 const EMA = require('./EMA.js');
 const SMMA = require('./SMMA.js');
 const ATR = require('./ATR.js');
+
+const defaults = {
+	
+	// Like overbought/oversold.
+	// Average of lagging period below compared to these thresholds.
+	// *** This indicator's result may end up numeric and not need these
+	overbusy: 70,
+	overquiet: 30,
+
+	// Lagging behavior
+	// Get average of lagged behavior from range
+	trailingPeriod: {
+		start: 2,
+		end: 5,
+		applyEma: 0 // 0 or 1 boolean - numeric for gen. backtests
+	},
+
+	bb: {
+		period: 2, // This is applied to ATR smoothing (SMMA) in places
+		multiplier: 20,
+	},
+
+	atr: {
+		period: 14
+		smoothing: 0 // EMA smoothing - not applied if zero
+	},
+
+	bb_and_atr_smoothing: 0 
+};
 
 var Indicator = function(settings) {
     this.input = 'candle';
@@ -15,12 +46,41 @@ var Indicator = function(settings) {
     this.result = false;
     this.age = 0;
 
-    this.bb = new BB(settings.bb);
-	this.atr = new ATR(settings.atr);
+    this.bb = new BB(settings.bb.period);
+	this.atr = new ATR(settings.atr.period);
+
+	this.atr_smma = new SMMA({ interval: settings.bb.period }); 
+	if (this.settings.atr.smoothing) {
+		this.atr_ema = new EMA({ interval: settings.atr.smoothing });
+	}
 }
 
 Indicator.prototype.update = candle => {
 	this.bb.update(candle);
+	this.atr.update(candle);
+	this.atr_smma.update(this.atr.result);
+
+	this.normalizedATR = this.normalizeATR(this.atr.result);
+
+	if (this.settings.bb_and_atr_smoothing) {
+		// this.bb_ema.update(this.bb.result);
+		this.atr_ema.update(this.normalizedATR);
+		// this.bbResult = this.bb_ema.result; Needed/Useful?
+		this.result = this.atr_ema.result;
+	} else {
+		// this.bbResult = this.bb.result; Needed/Useful?
+		this.result = this.normalizedATR;
+	}
+}
+
+// This applies smoothed BBs to the ATR instead of the candle
+function normalizeATR(atr) {
+	const basis_ATR = this.atr_smma.result;
+ 	const stdev_ATR = multiplier * stdev(atr, this.settings.bb.period);
+ 	const upper_ATR = basis_ATR + stdev_ATR
+ 	const lower_ATR = basis_ATR - stdev_ATR
+ 	const bb_relative_ATR = (atr - lower_ATR)/(upper_ATR - lower_ATR)
+ 	return (40 * bb_relative_ATR) + 30;
 }
 
 //@version=3
